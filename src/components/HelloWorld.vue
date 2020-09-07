@@ -1,58 +1,59 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+  <div>
+    <form @submit="push">
+      <input type="text" v-model="sub" />
+      <input type="password" v-model="sbc" />
+      <button>登陆</button>
+    </form>
+    <button @click="fn()">哈哈哈</button>
   </div>
 </template>
 
 <script>
+import "../initLeanCloud";
 export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
-  }
-}
-</script>
+  data() {
+    return {
+      sub: "",
+      sbc: "",
+      arr:[]
+    };
+  },
+  methods: {
+    push(e) {
+      var AV = require("leancloud-storage");
+      var username = this.sub;
+      var password = this.sbc;
+      alert(username);
+      alert(password);
+      var user = new AV.User();
+      user.setUsername(username);
+      user.setPassword(password);
+      user.signUp();
+      alert(1);
+      e.preventDefault();
+    },
+    fn() {
+      var AV = require("leancloud-storage");
+      var query = new AV.Query("_File");
+      query.equalTo("mime_type", "image/jpeg");
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-</style>
+      query.find().then(
+        (result) => {
+          this.arr = result;
+          // console.log(this.arr[0].attributes.url)
+          for(var i =0;i<this.arr.length;i++){
+            console.log(this.arr[i].attributes.url)
+          }
+          // console.log(this.arr.key)
+          // console.log(JSON.stringify(result));
+        },
+        (error) => {
+          console.log(JSON.stringify(error));
+        }
+      );
+      
+    },
+  },
+};
+</script>
